@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17252B">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Catatan Keuangan</title>
+<style>
+:root{--bg:#EEF2F0;--card:#fff;--ink:#17252B;--mut:#5B6B70;--line:#D9E1DD;--in:#1B7F5C;--out:#B3243F;--btn:#17252B;--btnt:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#0F1A1E;--card:#17252B;--ink:#E8EFEC;--mut:#93A5AA;--line:#27383F;--in:#4CC38F;--out:#F0708A;--btn:#E8EFEC;--btnt:#0F1A1E}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top) 0 calc(100px + env(safe-area-inset-bottom))}
+main{max-width:560px;margin:0 auto;padding:0 16px}
+.top{display:flex;justify-content:space-between;align-items:center;max-width:560px;margin:0 auto;padding:14px 16px 8px}
+.top h1{font-size:1.05rem;margin:0 0 4px;font-weight:650}
+select,input,button{font:inherit;color:inherit}
+select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;max-width:46vw}
+.ghost{background:none;border:1px solid var(--line);border-radius:10px;width:42px;height:42px;font-size:1.15rem;cursor:pointer}
+.hero{background:#17252B;color:#EAF2EE;border-radius:20px;padding:20px;margin-top:6px}
+.lbl{margin:0;font-size:.85rem;opacity:.7}
+.big{margin:2px 0 14px;font-size:2.1rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.split{display:flex;height:8px;border-radius:6px;overflow:hidden;background:#2B3F47}
+.split i{display:block;height:100%}
+#barIn{background:#5FD3A0}#barOut{background:#F28BA0}
+.duo{display:flex;gap:16px;margin-top:14px}
+.duo div{flex:1}.duo span{display:block;font-size:.8rem;opacity:.7}
+.duo b{font-size:1.05rem;font-variant-numeric:tabular-nums}
+#sumIn{color:#5FD3A0}#sumOut{color:#F28BA0}
+h2{font-size:.95rem;margin:24px 0 8px;font-weight:650}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.bk{display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;padding:5px 0;font-size:.9rem}
+.bk .tr{height:8px;border-radius:5px;background:var(--line);overflow:hidden}
+.bk .tr i{display:block;height:100%;background:var(--out);border-radius:5px}
+.bk b{font-variant-numeric:tabular-nums;font-weight:600}
+.day{font-size:.8rem;color:var(--mut);margin:16px 2px 6px}
+.tx{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.tx:last-child{border-bottom:0}
+.tx p{margin:0}.tx .s{font-weight:600}.tx .d{font-size:.85rem;color:var(--mut);overflow-wrap:anywhere}
+.tx .a{text-align:right;font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}
+.tx .n{font-size:.8rem;color:var(--mut);font-weight:400}
+.in{color:var(--in)}.out{color:var(--out)}
+.empty{text-align:center;color:var(--mut);padding:28px 8px}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));height:56px;padding:0 22px;border-radius:28px;border:0;background:var(--btn);color:var(--btnt);font-weight:650;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer}
+dialog{border:0;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:560px;margin:auto auto 0;background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+label{display:block;font-size:.85rem;color:var(--mut);margin:12px 0 4px}
+input[type=number],input[type=text],input[type=date],input[type=password],input[type=url],dialog select{width:100%;max-width:none;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.seg{display:flex;gap:8px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{flex:1;text-align:center;margin:0;padding:10px 6px;border:1px solid var(--line);border-radius:10px;color:var(--ink);cursor:pointer;background:var(--bg)}
+.seg input:checked+label{background:var(--btn);color:var(--btnt);border-color:var(--btn)}
+.seg input:focus-visible+label,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--in);outline-offset:2px}
+.acts{display:flex;gap:10px;margin-top:18px}
+.acts button{flex:1;padding:13px;border-radius:12px;border:1px solid var(--line);background:none;cursor:pointer}
+.acts .pri{background:var(--btn);color:var(--btnt);border-color:var(--btn);font-weight:650}
+.acts button:disabled{opacity:.5}
+.note{font-size:.8rem;color:var(--mut);margin:10px 0 0}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));background:var(--btn);color:var(--btnt);padding:10px 16px;border-radius:12px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center;z-index:9}
+#toast.on{opacity:1}
+#off{display:none;background:#8A5A00;color:#fff;text-align:center;font-size:.8rem;padding:4px}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<div id="off">Offline — menampilkan data terakhir. Tambah transaksi butuh internet.</div>
+<header class="top">
+  <div><h1>Catatan Keuangan</h1><select id="bulan" aria-label="Filter bulan"></select></div>
+  <button class="ghost" id="gear" aria-label="Pengaturan">⚙</button>
+</header>
+<main>
+  <div class="card" id="setup" style="display:none;margin-top:8px">
+    <p style="margin:0 0 8px">Belum terhubung ke Google Sheet.</p>
+    <button class="ghost" id="setupBtn" style="width:auto;padding:0 14px">Hubungkan</button>
+  </div>
+  <section class="hero">
+    <p class="lbl">Sisa saldo</p>
+    <p class="big" id="saldo">Rp0</p>
+    <div class="split"><i id="barIn"></i><i id="barOut"></i></div>
+    <div class="duo">
+      <div><span>Pemasukan</span><b id="sumIn">Rp0</b></div>
+      <div><span>Pengeluaran</span><b id="sumOut">Rp0</b></div>
+    </div>
+  </section>
+  <h2>Pengeluaran per sumber</h2>
+  <div class="card" id="bk"></div>
+  <h2>Riwayat</h2>
+  <div id="list"></div>
+</main>
+<button class="fab" id="add">+ Transaksi</button>
+<div id="toast" role="status"></div>
+
+<dialog id="dForm">
+  <form id="f">
+    <div class="seg" role="radiogroup" aria-label="Jenis">
+      <input type="radio" name="jenis" id="jOut" value="Pengeluaran" checked><label for="jOut">Pengeluaran</label>
+      <input type="radio" name="jenis" id="jIn" value="Pemasukan"><label for="jIn">Pemasukan</label>
+    </div>
+    <label for="nom">Nominal (Rp)</label>
+    <input type="number" id="nom" inputmode="numeric" min="1" step="1" required>
+    <label for="src">Sumber</label>
+    <select id="src" required></select>
+    <input type="text" id="srcLain" maxlength="40" placeholder="Tulis sumber baru" style="display:none;margin-top:8px">
+    <label>Nama</label>
+    <div class="seg" id="namaSeg"></div>
+    <label for="tgl">Tanggal</label>
+    <input type="date" id="tgl" required>
+    <label for="det">Detail</label>
+    <input type="text" id="det" maxlength="200" placeholder="mis. belanja pasar">
+    <div class="acts">
+      <button type="button" id="fCancel">Batal</button>
+      <button type="submit" class="pri" id="fSave">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dCfg">
+  <form id="c">
+    <label for="url">URL Web App (Apps Script)</label>
+    <input type="url" id="url" placeholder="https://script.google.com/macros/s/.../exec" required>
+    <label for="pin">PIN</label>
+    <input type="password" id="pin" autocomplete="off" required>
+    <p class="note">URL dan PIN hanya disimpan di HP ini.</p>
+    <div class="acts">
+      <button type="button" id="cCancel">Tutup</button>
+      <button type="submit" class="pri">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const LS={cfg:'ck_cfg',cache:'ck_cache',nama:'ck_nama'};
+const SUMBER={Pemasukan:['Ortu','Gaji','Utang'],Pengeluaran:['Makan','Jajan','Kebutuhan','Transport','Utang','Tabungan']};
+const NAMA=['Delz','Chilz','Berdua'];
+const $=s=>document.querySelector(s);
+const rp=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let rows=[],opsi=null;
+
+function cfg(){try{return JSON.parse(store.get(LS.cfg))||null}catch(e){return null}}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+function todayIso(){return new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+
+async function api(action,data){
+  const c=cfg();if(!c)throw new Error('Atur URL dan PIN dulu');
+  const r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,pin:c.pin,data})});
+  const j=await r.json();
+  if(!j.ok)throw new Error(j.error||'Gagal');
+  return j;
+}
+
+async function load(){
+  if(!cfg()){$('#setup').style.display='block';return}
+  $('#setup').style.display='none';
+  try{
+    const j=await api('list');
+    rows=j.rows||[];opsi=j.opsi||null;store.set(LS.cache,JSON.stringify(rows));store.set('ck_opsi',JSON.stringify(opsi));$('#off').style.display='none';
+  }catch(e){
+    try{rows=JSON.parse(store.get(LS.cache))||[];opsi=JSON.parse(store.get('ck_opsi'))}catch(x){rows=[]}
+    $('#off').style.display='block';toast(e.message);
+  }
+  render();
+}
+
+function render(){
+  const sel=$('#bulan'),cur=sel.value||'';
+  const months=[...new Set(rows.map(r=>r.tanggal.slice(0,7)))].sort().reverse();
+  sel.innerHTML='<option value="">Semua bulan</option>'+months.map(m=>{
+    const [y,mo]=m.split('-');
+    return `<option value="${m}">${new Date(y,mo-1,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</option>`}).join('');
+  sel.value=months.includes(cur)?cur:'';
+  const data=rows.filter(r=>!sel.value||r.tanggal.startsWith(sel.value));
+  const sum=j=>data.filter(r=>r.jenis===j).reduce((a,r)=>a+r.nominal,0);
+  const inc=sum('Pemasukan'),out=sum('Pengeluaran'),tot=inc+out||1;
+  $('#saldo').textContent=rp(inc-out);$('#sumIn').textContent=rp(inc);$('#sumOut').textContent=rp(out);
+  $('#barIn').style.width=inc/tot*100+'%';$('#barOut').style.width=out/tot*100+'%';
+  // per sumber (pengeluaran)
+  const g={};data.filter(r=>r.jenis==='Pengeluaran').forEach(r=>g[r.sumber||'-']=(g[r.sumber||'-']||0)+r.nominal);
+  const ent=Object.entries(g).sort((a,b)=>b[1]-a[1]),mx=ent.length?ent[0][1]:1;
+  $('#bk').innerHTML=ent.length?ent.map(([k,v])=>`<div class="bk"><span>${esc(k)}</span><span class="tr"><i style="width:${v/mx*100}%"></i></span><b>${rp(v)}</b></div>`).join(''):'<p class="empty">Belum ada pengeluaran.</p>';
+  // riwayat
+  const sorted=[...data].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)||b.row-a.row);
+  let html='',last='';
+  sorted.forEach(r=>{
+    if(r.tanggal!==last){last=r.tanggal;html+=`<p class="day">${new Date(r.tanggal+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})}</p>`}
+    const isIn=r.jenis==='Pemasukan';
+    html+=`<div class="tx"><div><p class="s">${esc(r.sumber)}</p><p class="d">${esc(r.detail)}</p></div><div class="a ${isIn?'in':'out'}">${isIn?'+':'−'}${rp(r.nominal)}<p class="n">${esc(r.nama)}</p></div></div>`;
+  });
+  $('#list').innerHTML=sorted.length?`<div class="card">${html}</div>`:'<p class="empty">Belum ada transaksi. Tekan “+ Transaksi” untuk mulai.</p>';
+}
+
+function fillSumber(){
+  const j=document.querySelector('input[name=jenis]:checked').value;
+  const l=opsi&&opsi.sumber&&opsi.sumber[j]&&opsi.sumber[j].length?opsi.sumber[j]:SUMBER[j];
+  $('#src').innerHTML=l.map(s=>`<option>${esc(s)}</option>`).join('')+'<option value="__lain">Lainnya…</option>';
+  toggleLain();
+}
+function toggleLain(){const on=$('#src').value==='__lain';$('#srcLain').style.display=on?'block':'none';$('#srcLain').required=on;$('#srcLain').value=''}
+function openForm(){
+  const names=opsi&&opsi.nama&&opsi.nama.length?opsi.nama:NAMA;
+  const saved=store.get(LS.nama),last=names.includes(saved)?saved:names[0];
+  $('#namaSeg').innerHTML=names.map((n,i)=>`<input type="radio" name="nama" id="n${i}" value="${esc(n)}" ${n===last?'checked':''}><label for="n${i}">${esc(n)}</label>`).join('');
+  $('#f').reset();$('#tgl').value=todayIso();
+  fillSumber();$('#dForm').showModal();$('#nom').focus();
+}
+function openCfg(){const c=cfg()||{};$('#url').value=c.url||'';$('#pin').value=c.pin||'';$('#dCfg').showModal()}
+
+$('#add').onclick=()=>cfg()?openForm():openCfg();
+$('#gear').onclick=openCfg;
+$('#setupBtn').onclick=openCfg;
+$('#fCancel').onclick=()=>$('#dForm').close();
+$('#cCancel').onclick=()=>$('#dCfg').close();
+$('#bulan').onchange=render;
+document.querySelectorAll('input[name=jenis]').forEach(i=>i.onchange=fillSumber);
+$('#src').onchange=toggleLain;
+
+$('#f').onsubmit=async e=>{
+  e.preventDefault();
+  const btn=$('#fSave'),nama=document.querySelector('input[name=nama]:checked').value;
+  const d={jenis:document.querySelector('input[name=jenis]:checked').value,nominal:Number($('#nom').value),sumber:$('#src').value==='__lain'?$('#srcLain').value.trim():$('#src').value,nama,tanggal:$('#tgl').value,detail:$('#det').value};
+  if(!(d.nominal>0)){toast('Nominal harus lebih dari 0');return}
+  btn.disabled=true;btn.textContent='Menyimpan…';
+  try{await api('add',d);store.set(LS.nama,nama);$('#dForm').close();toast('Transaksi tersimpan');await load()}
+  catch(err){toast(err.message==='Failed to fetch'?'Tidak ada koneksi':err.message)}
+  finally{btn.disabled=false;btn.textContent='Simpan'}
+};
+$('#c').onsubmit=e=>{
+  e.preventDefault();
+  const url=$('#url').value.trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec$/.test(url)){toast('URL harus berakhiran /exec dari Apps Script');return}
+  store.set(LS.cfg,JSON.stringify({url,pin:$('#pin').value}));$('#dCfg').close();load();
+};
+window.addEventListener('online',load);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+// Setup sekali klik: buka link ...#u=URL_EXEC&p=PIN (hash tidak dikirim ke server, lalu dihapus dari address bar)
+(function(){
+  if(!location.hash)return;
+  const h=new URLSearchParams(location.hash.slice(1)),u=h.get('u'),p=h.get('p');
+  if(!u||!p)return;
+  if(/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec$/.test(u)){
+    store.set(LS.cfg,JSON.stringify({url:u,pin:p}));setTimeout(()=>toast('Terhubung ke Google Sheet'),300);
+  }
+  history.replaceState(null,'',location.pathname+location.search);
+})();
+try{rows=JSON.parse(store.get(LS.cache))||[]}catch(e){rows=[]}
+render();load();
+</script>
+</body>
+</html>
